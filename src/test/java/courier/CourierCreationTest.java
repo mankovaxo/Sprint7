@@ -1,6 +1,7 @@
 package courier;
 
 import io.qameta.allure.Description;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import io.restassured.response.Response;
@@ -11,8 +12,28 @@ import utils.Random;
 import static org.apache.http.HttpStatus.*;
 
 public class CourierCreationTest {
+
     private final CourierTestSteps steps = new CourierTestSteps();
     private Courier courier;
+
+    @AfterEach
+    public void cleanup() {
+        if (courier != null && courier.getLogin() != null && courier.getPassword() != null) {
+            try {
+                // Логинимся, чтобы получить ID курьера
+                Response loginResponse = steps.loginCourier(courier);
+                if (loginResponse.statusCode() == SC_OK) {
+                    String courierId = loginResponse.jsonPath().getString("id");
+                    // Удаляем курьера, если получили его ID
+                    if (courierId != null) {
+                        steps.deleteCourier(courierId);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Failed to delete courier: " + e.getMessage());
+            }
+        }
+    }
 
     @Test
     @DisplayName("Успешное создание курьера")

@@ -5,10 +5,12 @@ import io.restassured.response.Response;
 import models.Courier;
 import api.ScooterApiClient;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CourierTestSteps {
+
     private final ScooterApiClient apiClient = new ScooterApiClient();
 
     @Step("Создать нового курьера")
@@ -29,7 +31,7 @@ public class CourierTestSteps {
     @Step("Проверить успешное создание курьера")
     public void verifyCourierCreatedSuccessfully(Response response) {
         response.then()
-                .statusCode(201)
+                .statusCode(SC_CREATED)
                 .body("ok", is(true));
     }
 
